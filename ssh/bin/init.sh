@@ -20,8 +20,10 @@ echo "$AUTHORIZED_KEYS" > /etc/ssh/authorized_keys/$SSH_USER
 chmod 644 /etc/ssh/authorized_keys/$SSH_USER
 
 # Set up homedir FS
-mkdir $homedir/in
-mkdir $homedir/out
+for d in $SSH_DIRS; do
+    echo Creating $homedir/$d.
+    mkdir $homedir/$d
+done
 
 
 # ------------------------------------------------------------------------------
@@ -57,14 +59,13 @@ chown root $homedir
 chgrp root $homedir
 chmod 0755 $homedir
 
-chown -R $SSH_USER:$SSH_USER $homedir/in
-chown -R $SSH_USER:$SSH_USER $homedir/out
-
-chmod 755 $homedir/in
-chmod 755 $homedir/out
-
-chmod -R 640 $homedir/in/*
-chmod -R 640 $homedir/out/*
+# Set SSH directory permissions
+for d in $SSH_DIRS; do
+    echo Creating $homedir/$d.
+    chown -R $SSH_USER:$SSH_USER $homedir/$d
+    chmod $SSH_DIR_PERM $homedir/$d
+    chmod -R $SSH_DIR_CONT_PERM $homedir/$d/*
+done
 
 echo Fix SSHD file permisions...
 chown -R root:root /etc/ssh/
